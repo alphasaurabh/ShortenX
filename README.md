@@ -2,11 +2,6 @@
 
 **ShortenX** is a modern, full-stack URL shortener and QR code generator built with **Next.js 14**, **Tailwind CSS**, and **MongoDB**. It features real-time link analytics, force-dynamic redirects, and instant QR code generation via a responsive tab-based UI.
 
-![Next.js](https://img.shields.io/badge/Next.js-14.1-black?style=for-the-badge&logo=next.js)
-![React](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
-![MongoDB](https://img.shields.io/badge/MongoDB-5.8-47A248?style=for-the-badge&logo=mongodb)
-
 ## ✨ Key Features
 
 * **🔗 Smart URL Shortening:** Converts long URLs into unique 6-character codes with automatic collision handling and retry logic.

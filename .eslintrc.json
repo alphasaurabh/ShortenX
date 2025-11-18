@@ -1,0 +1,8 @@
+{
+  "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended", "prettier"],
+  "plugins": ["tailwindcss"],
+  "rules": {
+    "react/no-unescaped-entities": "off",
+    "tailwindcss/no-custom-classname": "off"
+  }
+}

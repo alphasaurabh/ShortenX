@@ -1,4 +1,8 @@
+import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { getOriginFromRequest } from "@/lib/site";
+
+export const runtime = "nodejs";
 
 function makeShortCode(len = 6) {
   const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -7,16 +11,13 @@ function makeShortCode(len = 6) {
   return out;
 }
 
-function getBaseUrl(request) {
-  const base = process.env.BASE_URL;
-  if (base) return base;
-  
-  // Auto-detect from request origin (works on Vercel)
-  const origin = request.headers.get('origin') || request.headers.get('referer');
-  if (origin) return origin.replace(/\/$/, '');
-  
-  // Fallback to localhost
-  return 'http://localhost:3000';
+function isValidHttpUrl(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request) {
@@ -25,34 +26,34 @@ export async function POST(request) {
     const longUrl = body && body.url ? String(body.url).trim() : "";
 
     if (!longUrl) {
-      return new Response(JSON.stringify({ success: false, error: true, message: "Missing 'url' in request" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json({ success: false, error: true, message: "Missing 'url' in request" }, { status: 400 });
     }
 
-    try {
-      new URL(longUrl);
-    } catch {
-      return new Response(JSON.stringify({ success: false, error: true, message: "Invalid URL" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+    if (!isValidHttpUrl(longUrl)) {
+      return NextResponse.json({ success: false, error: true, message: "Invalid URL" }, { status: 400 });
     }
 
-    // If no MONGODB_URI, demo mode (useful for UI testing)
     if (!process.env.MONGODB_URI) {
+      if (process.env.NODE_ENV !== "development") {
+        console.error("[ShortenX] MONGODB_URI is missing in production.");
+        return NextResponse.json(
+          { success: false, error: true, message: "Database is not configured" },
+          { status: 500 }
+        );
+      }
+
       const short = makeShortCode(6);
-      const base = getBaseUrl(request);
+      const base = getOriginFromRequest(request);
       const shortUrl = `${base}/${short}`;
-      return new Response(JSON.stringify({ success: true, error: false, message: "Demo short url generated", shortUrl }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json({ success: true, error: false, message: "Demo short url generated", shortUrl }, { status: 200 });
     }
 
     const client = await clientPromise;
-    // choose the correct DB name (handle existing DB with different case)
+    if (!client) {
+      console.error("[ShortenX] MongoDB client did not initialize.");
+      return NextResponse.json({ success: false, error: true, message: "Database connection failed" }, { status: 500 });
+    }
+
     const desiredDb = "shortenx";
     const admin = client.db().admin();
     const dbs = await admin.listDatabases();
@@ -61,48 +62,47 @@ export async function POST(request) {
     const db = client.db(dbName);
     const collection = db.collection("urls");
 
-    // generate unique shortcode (retry)
     let short = makeShortCode(6);
     let attempts = 0;
-    while (attempts < 6) {
+    while (attempts < 10) {
       const exists = await collection.findOne({ shorturl: short });
       if (!exists) break;
       short = makeShortCode(6);
       attempts++;
     }
-    if (attempts >= 6) {
-      return new Response(JSON.stringify({ success: false, error: true, message: "Could not generate unique short url" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+
+    if (attempts >= 10) {
+      console.error("[ShortenX] Failed to generate a unique short code after retries.");
+      return NextResponse.json(
+        { success: false, error: true, message: "Could not generate unique short url" },
+        { status: 500 }
+      );
     }
 
     const doc = {
       url: longUrl,
       shorturl: short,
       createdAt: new Date(),
+      clicks: 0,
     };
 
     const insert = await collection.insertOne(doc);
 
-    const base = getBaseUrl(request);
+    const base = getOriginFromRequest(request);
     const shortUrl = `${base}/${short}`;
 
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         success: true,
         error: false,
         message: "URL Generated Successfully",
         shortUrl,
         id: insert.insertedId,
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      },
+      { status: 200 }
     );
   } catch (err) {
     console.error("ShortenX /api/generate error:", err);
-    return new Response(JSON.stringify({ success: false, error: true, message: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ success: false, error: true, message: "Internal server error" }, { status: 500 });
   }
 }

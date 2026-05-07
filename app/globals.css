@@ -2,23 +2,129 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#071226] text-slate-100 antialiased overflow-x-hidden;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: rgba(59, 130, 246, 0.28);
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass-panel {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.58));
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(96, 165, 250, 0.12);
+    box-shadow: 0 24px 80px rgba(2, 6, 23, 0.55);
+  }
+
+  .soft-blue-glow {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.14), 0 12px 60px rgba(37, 99, 235, 0.18);
+  }
+
+  .section-padding {
+    @apply px-6 lg:px-8;
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 12s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 7s ease-in-out infinite;
+  }
+
+  .shimmer-border {
+    position: relative;
+  }
+
+  .shimmer-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.35), rgba(37,99,235,0.08), rgba(59,130,246,0.18));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@layer components {
+  .premium-card {
+    @apply glass-panel rounded-[28px] transition-all duration-500 ease-out;
+  }
+
+  .premium-card-hover {
+    @apply hover:-translate-y-1 hover:border-blue-400/20 hover:shadow-[0_20px_70px_rgba(37,99,235,0.18)] hover:soft-blue-glow;
+  }
+
+  .premium-nav-link {
+    @apply relative px-1 py-2 text-slate-300 transition-colors duration-300 hover:text-white;
+  }
+
+  .premium-nav-link::after {
+    content: "";
+    @apply absolute left-0 -bottom-0.5 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-blue-400 to-blue-500 transition-transform duration-300 ease-out;
+  }
+
+  .premium-nav-link:hover::after,
+  .premium-nav-link[data-active="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .premium-input {
+    @apply w-full rounded-2xl border border-slate-700/80 bg-slate-950/50 px-4 py-3 text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10;
+  }
+
+  .premium-button {
+    @apply inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-3 font-semibold text-white shadow-[0_14px_30px_rgba(37,99,235,0.24)] transition-all duration-300 ease-out hover:from-blue-500 hover:to-blue-400 hover:shadow-[0_18px_40px_rgba(59,130,246,0.34)] hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .premium-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-blue-400/15 bg-blue-400/10 px-3 py-1 text-xs font-medium text-blue-200/90;
+  }
+}
+
 /* Base Reset */
 html, body, #__next {
   height: 100%;
   margin: 0;
   padding: 0;
 }
-
-/* Page background and typography */
-body {
-  background-color: #071226;
-  color: #e6eef6;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
-
-/* small card shadow */
-.shadow-soft {
-  box-shadow: 0 16px 40px rgba(2,6,23,0.7);
-}
-
-.rounded-3xl { border-radius: 1.25rem; }

@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import useQrGenerationTracking from "./useQrGenerationTracking";
+import { notifyStatsUpdated } from "../lib/stats-events";
 
 export default function ShortenCard() {
   const [tab, setTab] = useState("short");
@@ -8,6 +10,8 @@ export default function ShortenCard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useQrGenerationTracking({ shortUrl, isEnabled: Boolean(shortUrl && tab === "qr") });
 
   async function handleShorten(e) {
     e?.preventDefault();
@@ -40,6 +44,7 @@ export default function ShortenCard() {
       if (data && data.shortUrl) {
         setShortUrl(data.shortUrl);
         setTab("short");
+        notifyStatsUpdated();
       } else {
         throw new Error(data.message || "Unexpected server response");
       }

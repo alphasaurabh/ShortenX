@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { getOriginFromRequest } from "@/lib/site";
+import { incrementLinkCreated } from "@/lib/stats";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+function logStatsDebug(message, details = {}) {
+  if (process.env.NODE_ENV !== "production" || process.env.SHORTENX_STATS_DEBUG === "1") {
+    console.info(`[ShortenX][stats][generate] ${message}`, details);
+  }
+}
 
 function makeShortCode(len = 6) {
   const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -87,6 +95,12 @@ export async function POST(request) {
     };
 
     const insert = await collection.insertOne(doc);
+    const incremented = await incrementLinkCreated();
+    logStatsDebug("short link created", {
+      insertedId: String(insert.insertedId),
+      shorturl: short,
+      incremented,
+    });
 
     const base = getOriginFromRequest(request);
     const shortUrl = `${base}/${short}`;

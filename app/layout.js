@@ -28,11 +28,19 @@ export default function RootLayout({ children }) {
         <Navbar />
         <main className="relative z-10">{children}</main>
         <footer className="px-6 pb-8 pt-12">
-          <div className="mx-auto max-w-6xl rounded-[28px] border border-blue-400/10 bg-slate-950/55 px-6 py-6 text-slate-400 shadow-[0_18px_60px_rgba(2,6,23,0.42)] backdrop-blur-xl">
-            <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-              <div className="text-sm text-slate-300">&copy; {new Date().getFullYear()} ShortenX</div>
-              <div className="text-sm text-slate-500">Private URL shortener with QR generation and instant redirects.</div>
-            </div>
+          <div className="mx-auto flex max-w-6xl items-center justify-center rounded-[28px] border border-blue-400/10 bg-slate-950/55 px-6 py-6 text-center text-sm text-slate-400 shadow-[0_18px_60px_rgba(2,6,23,0.42)] backdrop-blur-xl sm:px-8">
+            <p className="leading-relaxed text-slate-500">
+              © 2026{" "}
+              <a
+                href="https://saurabhdev.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-300 transition-colors duration-200 hover:text-sky-300 hover:underline hover:underline-offset-4"
+              >
+                Saurabh Chandravanshi
+              </a>
+              . All rights reserved.
+            </p>
           </div>
         </footer>
       </body>

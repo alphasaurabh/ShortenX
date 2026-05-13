@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from "react";
+import useQrGenerationTracking from "./useQrGenerationTracking";
+import { notifyStatsUpdated } from "../lib/stats-events";
 
 function GradientHeroTitle() {
   return (
@@ -16,6 +18,8 @@ export default function Hero() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState("short");
+
+  useQrGenerationTracking({ shortUrl, isEnabled: Boolean(shortUrl && tab === "qr") });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,6 +50,7 @@ export default function Hero() {
       } else {
         setShortUrl(data.shortUrl);
         setUrl("");
+        notifyStatsUpdated();
       }
     } catch (err) {
       setError(err.message || "Network error");
@@ -82,7 +87,7 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <a href="#shorten" className="premium-button">Get your link</a>
+            
             <span className="rounded-2xl border border-blue-400/12 bg-white/5 px-4 py-3 text-sm text-slate-300">
               Fast, private, and ready for production.
             </span>

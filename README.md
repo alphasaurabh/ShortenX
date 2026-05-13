@@ -29,7 +29,7 @@
 ### Tools
 * **Linting:** ESLint 8.49.0
 * **Formatting:** Prettier 3.0.0
-* **Deployment:** Vercel (Recommended)
+* **Deployment:** Vercel 
 
 ---
 
@@ -83,7 +83,7 @@ Visit `http://localhost:3000` to see the app in action.
 **Endpoint:** `POST /api/generate`
 
 **Request Body:**
-```json
+'json
 {
   "url": "[https://example.com/very/long/url](https://example.com/very/long/url)"
 }

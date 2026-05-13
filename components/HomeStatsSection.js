@@ -6,7 +6,7 @@ import { STATS_UPDATED_EVENT } from "../lib/stats-events";
 
 const stats = [
   {
-    label: "Total shortened links created",
+    label: "Total links created",
     getValue: (data) => data.linksCreated,
   },
   {
